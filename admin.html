@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data: https://*.googleusercontent.com; connect-src 'self'">
+<meta name="robots" content="noindex">
+<title>AP Finance – Admin</title>
+<link rel="icon" href="assets/icon-192.png">
+<style>
+  :root { --brand: #4338ca; --line: #e2e8f0; --muted: #64748b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.5 "Segoe UI", system-ui, Arial, sans-serif; background: #f4f5f9; color: #0f172a; }
+  header { background: #fff; border-bottom: 1px solid var(--line); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 5; }
+  header .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; }
+  header img { width: 36px; height: 36px; border-radius: 9px; }
+  header small { display: block; font-weight: 500; color: var(--muted); font-size: 12px; }
+  .testbar { background: #ea580c; color: #fff; text-align: center; font-weight: 700; font-size: 12px; padding: 4px; }
+  main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 18px; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .v { font-size: 22px; font-weight: 700; margin-top: 2px; }
+  .s { font-size: 12px; color: var(--muted); margin-top: 2px; word-break: break-all; }
+  button, .btn { font: inherit; border: 1px solid #cbd5e1; background: #fff; border-radius: 8px; padding: 6px 11px; cursor: pointer; color: inherit; text-decoration: none; display: inline-block; white-space: nowrap; }
+  button:hover, .btn:hover { background: #f8fafc; }
+  .primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+  .primary:hover { background: #3730a3; }
+  .danger { color: #b91c1c; border-color: #fecaca; }
+  .ice { color: #0369a1; border-color: #bae6fd; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+  .toolbar input { font: inherit; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 999px; min-width: 280px; background: #fff; }
+  .seg button { border-radius: 999px; }
+  .seg button.sel { background: #0f172a; color: #fff; border-color: #0f172a; }
+  /* profile cards, Pinterest-like masonry */
+  .pins { column-width: 270px; column-gap: 16px; }
+  .pin { break-inside: avoid; margin: 0 0 16px; background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(15,23,42,.04); transition: box-shadow .15s; }
+  .pin:hover { box-shadow: 0 8px 24px rgba(15,23,42,.10); }
+  .pin .cover { position: relative; background: linear-gradient(135deg,#eef2ff,#f8fafc); display: flex; align-items: center; justify-content: center; padding: 22px 0 16px; }
+  .pin .logo { width: 108px; height: 108px; border-radius: 22px; object-fit: cover; background: #fff; border: 1px solid var(--line); box-shadow: 0 4px 14px rgba(15,23,42,.08); }
+  .pin .initial { width: 108px; height: 108px; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 42px; font-weight: 800; color: #fff; background: linear-gradient(135deg,#6366f1,#4338ca); }
+  .pin .status { position: absolute; top: 10px; left: 10px; }
+  .pin .avatar { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .pin .body { padding: 12px 16px 16px; }
+  .pin h3 { margin: 0; font-size: 17px; line-height: 1.25; }
+  .pin .who { color: var(--muted); font-size: 13px; margin-top: 2px; word-break: break-all; }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; margin: 12px 0; font-size: 12px; }
+  .facts div b { display: block; font-size: 13px; color: #0f172a; }
+  .facts div { color: var(--muted); }
+  .pin .acts { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pin.frozen { border-color: #7dd3fc; }
+  .pin.frozen .cover { background: linear-gradient(135deg,#e0f2fe,#f0f9ff); }
+  .pill { white-space: nowrap; display: inline-block; border-radius: 999px; padding: 2px 9px; font-size: 11px; font-weight: 700; }
+  .on { background: #dcfce7; color: #166534; } .off { background: #f1f5f9; color: #475569; }
+  .frz { background: #e0f2fe; color: #075985; } .wait { background: #fef3c7; color: #92400e; }
+  .muted { color: var(--muted); font-size: 12px; }
+  .login { max-width: 440px; margin: 12vh auto; text-align: center; padding: 32px; }
+  .toast { position: fixed; right: 20px; bottom: 20px; background: #0f172a; color: #fff; padding: 10px 14px; border-radius: 10px; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: 420px; z-index: 50; }
+  .toast.show { opacity: 1; } .toast.err { background: #b91c1c; }
+  .modal-back { position: fixed; inset: 0; background: rgba(15,23,42,.45); display: flex; align-items: center; justify-content: center; z-index: 30; }
+  .modal { background: #fff; border-radius: 14px; padding: 24px; max-width: 460px; width: calc(100% - 32px); }
+  .hidden { display: none !important; }
+  /* records viewer */
+  .viewer { position: fixed; inset: 0; background: #f4f5f9; z-index: 20; overflow: auto; }
+  .viewer header { position: sticky; }
+  .viewer .ro { background: #fef3c7; color: #92400e; font-weight: 600; font-size: 12px; border-radius: 999px; padding: 3px 10px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; }
+  .tabs button.sel { background: var(--brand); color: #fff; border-color: var(--brand); }
+  table { width: 100%; border-collapse: collapse; background: #fff; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 13px; }
+  th { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; background: #f8fafc; position: sticky; top: 0; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  .tbl { border: 1px solid var(--line); border-radius: 12px; overflow: auto; max-height: 70vh; }
+  select { font: inherit; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; }
+  .empty { text-align: center; color: var(--muted); padding: 40px; }
+</style>
+</head>
+<body>
+<div id="testBar" class="testbar hidden">TEST COPY — test users and test data only (Drive folder "AP Finance – TEST")</div>
+<header>
+  <div class="brand"><img src="assets/icon-192.png" alt=""><div>AP Finance – Admin<small>Hostels, records, backups and access</small></div></div>
+  <div style="display:flex;gap:10px;align-items:center"><span id="who" class="muted"></span><button id="logoutBtn" class="hidden">Sign out</button></div>
+</header>
+
+<main>
+  <div id="loginBox" class="card login hidden">
+    <img src="assets/icon-192.png" alt="" style="width:64px;height:64px;border-radius:16px">
+    <h2>Admin sign-in</h2>
+    <p class="muted">Only the admin Gmail can open this panel. Signing in also lets AP Finance keep every hostel's backup in your Google Drive.</p>
+    <a class="btn primary" href="api/auth?kind=admin">Sign in with Google</a>
+    <p id="loginMsg" class="muted"></p>
+  </div>
+
+  <div id="panel" class="hidden">
+    <div class="stats">
+      <div class="card"><div class="k">Hostels</div><div class="v" id="stUsers">–</div><div class="s" id="stUsersS"></div></div>
+      <div class="card"><div class="k">Online now</div><div class="v" id="stOnline">–</div><div class="s">active in the last 3 minutes</div></div>
+      <div class="card"><div class="k">Drive storage used</div><div class="v" id="stStorage">–</div><div class="s" id="stFiles"></div></div>
+      <div class="card"><div class="k">Google Drive</div><div class="v" id="stDrive" style="font-size:16px">–</div><div class="s" id="stDriveS"></div></div>
+      <div class="card"><div class="k">Form scanner</div><div class="v" id="stScan" style="font-size:16px">–</div><div class="s" id="stScanS"></div></div>
+    </div>
+    <div class="toolbar">
+      <input id="q" placeholder="Search hostel, name or Gmail…" autocomplete="off">
+      <div class="seg" id="filter"><button data-f="all" class="sel">All</button> <button data-f="online">Online</button> <button data-f="frozen">Frozen</button> <button data-f="setup">Not set up</button></div>
+      <span class="muted" id="updated"></span>
+    </div>
+    <div id="pins" class="pins"></div>
+    <div id="none" class="empty hidden">No hostels yet. When someone opens the app and signs in with Google, they appear here.</div>
+  </div>
+</main>
+
+<div id="viewer" class="viewer hidden">
+  <header>
+    <div class="brand"><img id="vLogo" src="assets/icon-192.png" alt=""><div><span id="vName"></span><small id="vSub"></small></div></div>
+    <div style="display:flex;gap:10px;align-items:center"><span class="ro">Read-only</span><button id="vClose">✕ Close</button></div>
+  </header>
+  <main>
+    <div class="toolbar"><div class="seg" id="vSections"></div><label class="muted">Month <select id="vMonth"></select></label><span class="muted" id="vWhen"></span></div>
+    <div class="stats" id="vStats"></div>
+    <div class="tabs" id="vTabs"><button data-t="students" class="sel">Students</button><button data-t="fees">Monthly fees</button><button data-t="income">Income</button><button data-t="expenditure">Expenditure</button><button data-t="admissions">Admissions</button><button data-t="rooms">Rooms</button></div>
+    <div id="vBody"></div>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="js/bs-data.js"></script>
+<script src="js/core.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
